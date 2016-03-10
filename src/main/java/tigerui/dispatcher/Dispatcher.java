@@ -29,17 +29,18 @@ public interface Dispatcher<V, S extends Subscriber, O extends Observer<V>> exte
     
     public static enum Type { PROPERTY, EVENT }
 
-    /**
-     * Dispatches the new value.<br>
-     * <br>
-     * NOTES:<br>
-     * 1. Before dispatching the isDispatching flag will be set to true 2. After
-     * dispatching the isDispatching flag will be set to false
-     * 
-     * @param newValue
-     * @throws IllegalStateException
-     *             if called when the dispatcher is disposed.
-     */
+	/**
+	 * Dispatches the new value.<br>
+	 * <br>
+	 * NOTES:<br>
+	 * 1. Before dispatching the isDispatching flag will be set to true 2. After
+	 * dispatching the isDispatching flag will be set to false
+	 * 
+	 * @param newValue
+	 *            the value to dispatch
+	 * @throws IllegalStateException
+	 *             if called when the dispatcher is disposed.
+	 */
     void dispatch(V newValue);
     
     /**
@@ -82,11 +83,13 @@ public interface Dispatcher<V, S extends Subscriber, O extends Observer<V>> exte
      */
     Type getType();
 
-    /**
-     * Creates a {@link Dispatcher} to be used to dispatch property events.
-     * 
-     * @return a new {@link Dispatcher} to be used to dispatch property events.
-     */
+	/**
+	 * Creates a {@link Dispatcher} to be used to dispatch property events.
+	 * 
+	 * @return a new {@link Dispatcher} to be used to dispatch property events.
+	 * @param <V>
+	 *            the type of the property dispatcher to create
+	 */
     static <V> PropertyDispatcher<V> createPropertyDispatcher() {
         return Dispatchers.getInstance().createPropertyDispatcher();
     }

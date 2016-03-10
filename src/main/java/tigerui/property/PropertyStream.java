@@ -52,7 +52,7 @@ import tigerui.subscription.Subscription;
  * 1) A property stream will emit a new value via
  * {@link #onChanged(Consumer)} when it's value changes.<br>
  * 2) Once the property is disposed it will emit an onDiposed event.<br>
- * 3) A property stream is assumed to always contain a value.<br>
+ * 3) A property stream is assumed to always contain a value.<br> 
  * 
  * @param <M>
  *            the type of the value this property stream emits.
@@ -84,6 +84,8 @@ public class PropertyStream<M> implements Supplier<M> {
      * 
      * @param propertyPublisher some property publisher
      * @return a new {@link PropertyStream} that is linked to the provided publisher
+	 * @param <M>
+	 *            the type of the property stream to create
      */
     public static <M> PropertyStream<M> create(PropertyPublisher<M> propertyPublisher) {
         return new PropertyStream<>(propertyPublisher);
@@ -172,6 +174,8 @@ public class PropertyStream<M> implements Supplier<M> {
      * 
      * @param mapper some function the emitted values of this property stream.
      * @return a new {@link PropertyStream} with the values transformed by the provided mapper.
+	 * @param <R>
+	 *            the type of the event stream created by applying the scan function
      */
     public final <R> PropertyStream<R> map(Function<M, R> mapper) {
         return lift(new OperatorMap<>(mapper));
@@ -275,6 +279,8 @@ public class PropertyStream<M> implements Supplier<M> {
      *            the last computed value generating a new R.
      * @return a new {@link EventStream} of values computed as per the scan
      *         function.
+	 * @param <R>
+	 *            the type of the event stream created by applying the scan function
      */
     public final <R> EventStream<R> scan(BiFunction<M, Optional<R>, R> scanFunction) {
         return asEventStream().scan(scanFunction);
@@ -296,31 +302,33 @@ public class PropertyStream<M> implements Supplier<M> {
      *            value will be emitted immediately to all subscribers.
      * @return a new {@link EventStream} of values computed as per the scan
      *         function.
+	 * @param <R>
+	 *            the type of the event stream created by applying the scan function
      */
     public final <R> EventStream<R> scan(BiFunction<M, R, R> scanFunction, R seed) {
         return asEventStream().scan(scanFunction, seed);
     }
     
-    /**
-     * Scans this stream by combining the previously computed value of M with
-     * every property change that is emitted generating a new M.
-     * 
-     * The event stream created by this method, will emit a value immediately
-     * using the seed value and then a new value every time this stream emits an
-     * event.
-     * 
-     * This method is provided as a convenience, since
-     * {@link #scan(BiFunction, Object)} could be called directly.
-     * 
-     * @param scanFunction
-     *            some function that will be applied to each emitted value and
-     *            the last computed value generating a new M.
-     * @param seed
-     *            some initial value to start the scan operation with. This
-     *            value will be emitted immediately to all subscribers.
-     * @return a new {@link EventStream} of values computed as per the scan
-     *         function.
-     */
+	/**
+	 * Scans this stream by combining the previously computed value of M with
+	 * every property change that is emitted generating a new M.
+	 * 
+	 * The event stream created by this method, will emit a value immediately
+	 * using the seed value and then a new value every time this stream emits an
+	 * event.
+	 * 
+	 * This method is provided as a convenience, since
+	 * {@link #scan(BiFunction, Object)} could be called directly.
+	 * 
+	 * @param accumulator
+	 *            some accumulator function that will be applied to each emitted
+	 *            value and the last computed value generating a new M.
+	 * @param initialValue
+	 *            some initial value to start the scan operation with. This
+	 *            value will be emitted immediately to all subscribers.
+	 * @return a new {@link EventStream} of values computed as per the scan
+	 *         function.
+	 */
     public final EventStream<M> accumulate(BinaryOperator<M> accumulator, M initialValue) {
         return asEventStream().scan(accumulator, initialValue);
     }
@@ -347,6 +355,8 @@ public class PropertyStream<M> implements Supplier<M> {
      *            property streams.
      * @return a new property stream that uses the provided switchFunction to
      *         switch between a set of source property streams.
+	 * @param <R>
+	 *            the type of the property stream created by applying the switch map function
      */
     public final <R> PropertyStream<R> switchMap(Function<M, PropertyStream<R>> switchFunction) {
         return lift(new OperatorSwitchMap<>(switchFunction));
@@ -359,6 +369,8 @@ public class PropertyStream<M> implements Supplier<M> {
      *            some operator that converts the value stream.
      * @return a new {@link PropertyStream} which results from applying the
      *         provided operator to this property stream.
+	 * @param <R>
+	 *            the type of the property stream created by applying the lift function
      */
     public final <R> PropertyStream<R> lift(PropertyOperator<M, R> operator) {
         Objects.requireNonNull(operator);
@@ -440,6 +452,12 @@ public class PropertyStream<M> implements Supplier<M> {
      * @return a new {@link PropertyStream} that will emit the result of combining
      *         the values of the provided streams using the provided
      *         function any time either streams' value changes.
+	 * @param <T1>
+	 *            the type of the property stream of the first input stream
+	 * @param <T2>
+	 *            the type of the property stream of the first input stream
+	 * @param <R>
+	 *            the type of the property stream created by applying the combiner function
      */
     public static <T1, T2, R> PropertyStream<R> combine(PropertyStream<T1> stream1, 
                                                         PropertyStream<T2> stream2, 
@@ -458,6 +476,8 @@ public class PropertyStream<M> implements Supplier<M> {
      *            the value to emit
      * @return a new {@link PropertyStream} that when subscribed to emits the
      *         provided values and then signals disposed.
+	 * @param <R>
+	 *            the type of the property stream created for the provided value
      */
     public static <R> PropertyStream<R> just(R value) {
         return new PropertyStream<>(new JustPropertyPublisher<>(value));

@@ -28,7 +28,7 @@ public interface PropertySource<M> extends Consumer<M>, Supplier<M> {
     /**
      * Sets the current value of this property.
      * 
-     * @param value
+     * @param newValue
      *            a new value to set to this property.
      * @throws NullPointerException
      *             if an attempt is made to set the value to null.

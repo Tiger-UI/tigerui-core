@@ -21,7 +21,7 @@ import tigerui.property.Property;
  * An Event Binding is a special type of Event Observer that represents an
  * observer that binds an event stream to a property. When dispatching events
  * event bindings are processed last, this guarantees that all stream observers
- * are notified and up to date before processing any [event stream --> property]
+ * are notified and up to date before processing any [event stream to property]
  * event propagation. 
  * The reasoning behind this is that it should help to remove glitches and
  * redundant updates. See <a href="http://stackoverflow.com/a/25141234">glich

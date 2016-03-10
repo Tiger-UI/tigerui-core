@@ -115,7 +115,7 @@ public interface EventLoop {
      * 
      * @param runnable
      *            some runnable to execute
-     * @param delay
+     * @param time
      *            some delay from now.
      * @param timeUnit
      *            the time unit of the delay

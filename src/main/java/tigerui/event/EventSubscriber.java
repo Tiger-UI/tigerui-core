@@ -23,10 +23,12 @@ import tigerui.subscription.Subscription;
  * A subscriber used when subscribing to an {@link EventStream}.
  * <p>
  * NOTES:
+ * <ol>
  * <li>Once completed, the subscriber will ignore future calls to
  * {@link #onEvent(Object)} or {@link #onCompleted()}.
  * <li>All callbacks are called safely, i.e. if a callback throws it will not
  * interrupt the other callbacks.
+ * </ol>
  * 
  * @param <E>
  *            the type of data that the {@link EventStream} which this

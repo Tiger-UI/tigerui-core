@@ -38,12 +38,17 @@ public interface PropertyPublisher<T> extends Publisher<T, PropertyObserver<T>>,
      */
     Subscription subscribe(PropertyObserver<T> observer);
     
-    /**
-     * Creates a default {@link PropertyPublisher}.
-     * @param propertySupplier some supplier that provides property values.
-     * @param dispatcher some dispatcher to dispatch property events.
-     * @return a new {@link PropertyPublisher}
-     */
+	/**
+	 * Creates a default {@link PropertyPublisher}.
+	 * 
+	 * @param propertySupplier
+	 *            some supplier that provides property values.
+	 * @param dispatcher
+	 *            some dispatcher to dispatch property events.
+	 * @return a new {@link PropertyPublisher}
+	 * @param <T>
+	 *            the type of the property publisher to create
+	 */
     static <T> PropertyPublisher<T> create(Supplier<T> propertySupplier, PropertyDispatcher<T> dispatcher) {
         return new PropertyPublisherImpl<>(propertySupplier, dispatcher);
     }

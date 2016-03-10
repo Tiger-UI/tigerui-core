@@ -41,36 +41,47 @@ public interface PropertyObserver<M> extends Observer<M> {
     
     // Factory methods
 
-    /**
-     * Creates a property observer that only observes onChanged events.
-     * 
-     * @param onChangeListener
-     *            some consumer of onChanged events.
-     * @return a new {@link PropertyObserver} that only observes onChanged
-     *         events.
-     */
+	/**
+	 * Creates a property observer that only observes onChanged events.
+	 * 
+	 * @param onChangeListener
+	 *            some consumer of onChanged events.
+	 * @return a new {@link PropertyObserver} that only observes onChanged
+	 *         events.
+	 * @param <M>
+	 *            the type of the values emitted by the observed property.
+	 */
     static <M> PropertyObserver<M> create(Consumer<M> onChangeListener) {
         return create(onChangeListener, () -> {});
     }
 
-    /**
-     * Creates a property observer that only observes onDisposed events.
-     * 
-     * @param onDestroy
-     *            some runnable to run when the observed property is destroyed.
-     * @return a new {@link PropertyObserver} that only observes onDisposed
-     *         events.
-     */
+	/**
+	 * Creates a property observer that only observes onDisposed events.
+	 * 
+	 * @param onDestroy
+	 *            some runnable to run when the observed property is destroyed.
+	 * @return a new {@link PropertyObserver} that only observes onDisposed
+	 *         events.
+	 * @param <M>
+	 *            the type of the values emitted by the observed property.
+	 */
     static <M> PropertyObserver<M> create(Runnable onDestroy) {
         return create(newValue -> {} , onDestroy);
     }
 
-    /**
-     * Creates a property observer that observes, both onChanged and onDisposed events.
-     * @param onChanged some consumer of onChanged events.
-     * @param onDisposed some runnable to run when the observed property is destroyed.
-     * @return
-     */
+	/**
+	 * Creates a property observer that observes, both onChanged and onDisposed
+	 * events.
+	 * 
+	 * @param onChanged
+	 *            some consumer of onChanged events.
+	 * @param onDisposed
+	 *            some runnable to run when the observed property is destroyed.
+	 * @return a new {@link PropertyObserver} that observes onChanged and
+	 *         onDisposed events.
+	 * @param <M>
+	 *            the type of the values emitted by the observed property.
+	 */
     static <M> PropertyObserver<M> create(Consumer<M> onChanged, Runnable onDisposed) {
         Objects.isNull(onChanged);
         Objects.requireNonNull(onDisposed);

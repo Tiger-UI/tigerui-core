@@ -57,6 +57,7 @@ import tigerui.subscription.Subscription;
  * 
  * <p>
  * Notes:
+ * <ol>
  * <li>An Event Stream will emit zero, one or many events followed by one
  * completed event.
  * <li>An Event Stream can only be interacted with on the same thread that it
@@ -65,6 +66,7 @@ import tigerui.subscription.Subscription;
  * <li>An Event Stream does not <i><b>"remember"</b></i> the last event that it
  * published. Therefore new observers will not be called back immediately as
  * with a {@link Property}.
+ * </ol>
  * 
  * @param <E>
  *            The type of events emitted by this event stream.
@@ -119,18 +121,22 @@ public class EventStream<E> {
         return observe(EventObserver.create(onCompletedAction));
     }
     
-    /**
-     * Subscribes to onEvents and onCompleted events, via the provided
-     * eventHandler and onCompleteAction.
-     * 
-     * @param observer
-     *            some {@link EventObserver} to observe this stream.
-     * @return a {@link Subscription} that can be used to stop this observer
-     *         from responding to events.
-     * @throws IllegalStateException
-     *             if called from a thread other than the thread that this event
-     *             stream was created on.
-     */
+	/**
+	 * Subscribes to onEvents and onCompleted events, via the provided
+	 * eventHandler and onCompleteAction.
+	 * 
+	 * @param eventHandler
+	 *            some {@link Consumer} to observe events emitted from this
+	 *            stream.
+	 * @param onCompleteAction
+	 *            some {@link Runnable} to execute when this stream is
+	 *            completed.
+	 * @return a {@link Subscription} that can be used to stop this observer
+	 *         from responding to events.
+	 * @throws IllegalStateException
+	 *             if called from a thread other than the thread that this event
+	 *             stream was created on.
+	 */
     public final Subscription observe(Consumer<E> eventHandler, Runnable onCompleteAction) {
         return eventPublisher.subscribe(EventObserver.create(eventHandler, onCompleteAction));
     }
@@ -151,13 +157,15 @@ public class EventStream<E> {
         return eventPublisher.subscribe(observer);
     }
     
-    /**
-     * Transforms this stream by the provided operator, creating a new stream.
-     * 
-     * @param operator
-     *            some operator to transform this stream by.
-     * @return a new {@link EventStream} transformed by the provided operator.
-     */
+	/**
+	 * Transforms this stream by the provided operator, creating a new stream.
+	 * 
+	 * @param operator
+	 *            some operator to transform this stream by.
+	 * @return a new {@link EventStream} transformed by the provided operator.
+	 * @param <R>
+	 *            the type of the event stream created by applying the lift function
+	 */
     public final <R> EventStream<R> lift(Operator<E, R> operator) {
         requireNonNull(operator);
         return new EventStream<>(new LiftEventPublisher<>(operator, eventPublisher), eventLoop);
@@ -171,6 +179,8 @@ public class EventStream<E> {
      *            some function to transform the events emitted by this stream.
      * @return a new {@link EventStream}, that transforms events emitted by this
      *         stream by the provided mapper.
+	 * @param <R>
+	 *            the type of the event stream created by applying the map function
      */
     public final <R> EventStream<R> map(Function<E, R> mapper) {
         return lift(new OperatorMap<>(mapper));
@@ -216,6 +226,8 @@ public class EventStream<E> {
      *            the last computed value generating a new R.
      * @return a new {@link EventStream} of values computed as per the scan
      *         function.
+	 * @param <R>
+	 *            the type of the event stream created by applying the scan function
      */
     public final <R> EventStream<R> scan(BiFunction<E, Optional<R>, R> scanFunction) {
         return lift(new OperatorScanOptional<>(scanFunction));
@@ -237,40 +249,52 @@ public class EventStream<E> {
      *            value will be emitted immediately to all subscribers.
      * @return a new {@link EventStream} of values computed as per the scan
      *         function.
+	 * @param <R>
+	 *            the type of the event stream created by applying the scan function
      */
     public final <R> EventStream<R> scan(BiFunction<E, R, R> scanFunction, R seed) {
         return lift(new OperatorScan<>(scanFunction, seed));
     }
     
-    /**
-     * Scans this stream by combining the previously computed value of R with
-     * every event that is emitted generating a new R.
-     * 
-     * The event stream created by this method, will emit a value immediately
-     * using the seed value and then a new value every time this stream emits an
-     * event.
-     * 
-     * This method is provided as a convenience, since
-     * {@link #scan(BiFunction, Object)} could be called directly.
-     * 
-     * @param scanFunction
-     *            some function that will be applied to each emitted value and
-     *            the last computed value generating a new R.
-     * @param seed
-     *            some initial value to start the scan operation with. This
-     *            value will be emitted immediately to all subscribers.
-     * @return a new {@link EventStream} of values computed as per the scan
-     *         function.
-     */
+	/**
+	 * Scans this stream by combining the previously computed value of R with
+	 * every event that is emitted generating a new R.
+	 * 
+	 * The event stream created by this method, will emit a value immediately
+	 * using the seed value and then a new value every time this stream emits an
+	 * event.
+	 * 
+	 * This method is provided as a convenience, since
+	 * {@link #scan(BiFunction, Object)} could be called directly.
+	 * 
+	 * @param accumulator
+	 *            some accumulator function that will be applied to each emitted
+	 *            value and the last computed value generating a new R.
+	 * @param initialValue
+	 *            some initial value to start the scan operation with. This
+	 *            value will be emitted immediately to all subscribers.
+	 * @return a new {@link EventStream} of values computed as per the scan
+	 *         function.
+	 */
     public final EventStream<E> accumulate(BinaryOperator<E> accumulator, E initialValue) {
         return scan(accumulator, initialValue);
     }
     
-    /**
-     * @return an {@link EventStream} of change events for this
-     *         stream. The stream will not emit a value after subscribing
-     *         until the stream has emitted at least two events.
-     */
+	/**
+	 * Creates a new event stream that emits a new event ever time there has
+	 * been a event and applies the provided function the current event and the
+	 * last emitted event.
+	 * 
+	 * @param changeEventFactory
+	 *            some function that will be called with the current event and
+	 *            the last emitted event
+	 * @return an {@link EventStream} of change events for this stream. The
+	 *         stream will not emit a value after subscribing until the stream
+	 *         has emitted at least two events.
+	 * @param <C>
+	 *            the type of the event stream created by applying the change
+	 *            event factory function
+	 */
     public final <C> EventStream<C> changes(BiFunction<E, E, C> changeEventFactory) {
         return lift(new OperatorChanges<>(changeEventFactory));
     }
@@ -319,10 +343,10 @@ public class EventStream<E> {
      * switchFunction. Visually, this is roughly equivalent to the following:
      * <br>
      *                    _________________________________
-     *                   |       switchFunction            | 
-     *                   | [stream 1] -->                  |
-     * [this stream] --> | [stream 2] --> switches between | --> [stream 1 | stream 2 | stream 3]
-     *                   | [stream 3] -->     streams      |
+     *                   |         switchFunction          | 
+     *                   | [stream 1] ---                  |
+     * [this stream] --- | [stream 2] --- switches between | --- [stream 1 | stream 2 | stream 3]
+     *                   | [stream 3] ---     streams      |
      *                   |_________________________________|
      * <br>
      * @param switchFunction
@@ -330,6 +354,8 @@ public class EventStream<E> {
      *            event streams.
      * @return a new event stream that uses the provided switchFunction to switch
      *         between a set of source event streams.
+	 * @param <R>
+	 *            the type of the event stream created by applying the switch function
      */
     public final <R> EventStream<R> switchMap(Function<E, EventStream<R>> switchFunction) {
         return lift(new OperatorSwitchMap<>(switchFunction));
@@ -347,6 +373,8 @@ public class EventStream<E> {
      *            the initial value for the property stream that is returned.
      * @return a new property stream that uses the provided switchFunction to
      *         switch between a set of source property streams.
+	 * @param <R>
+	 *            the type of the property stream created by applying the lift function
      */
     public final <R> PropertyStream<R> switchMap(Function<E, PropertyStream<R>> switchFunction, R initialValue) {
         
@@ -409,6 +437,8 @@ public class EventStream<E> {
      *            created event stream.
      * @return A new {@link EventStream} whose source of events is the provided
      *         observable.
+	 * @param <E>
+	 *            the type of the event stream created from the provided Observable
      */
     public static final <E> EventStream<E> from(Observable<E> observable) {
         
@@ -452,6 +482,8 @@ public class EventStream<E> {
      *            some events to create an event stream for.
      * @return a new {@link EventStream} that will dispatch all the events when
      *         subscribed to and then complete.
+	 * @param <T>
+	 *            the type of the event stream created from the provided array
      */
     @SafeVarargs
     public static final <T> EventStream<T> fromArray(T... events) {
@@ -463,10 +495,12 @@ public class EventStream<E> {
      * returned event stream will be dispatched all the events and then be
      * completed.
      * 
-     * @param events
-     *            some iterable of events to create an event stream for.
+     * @param eventList
+     *            some {@link Iterable} of events to create an event stream for.
      * @return a new {@link EventStream} that will dispatch all the events when
      *         subscribed to and then complete.
+	 * @param <T>
+	 *            the type of the event stream created from the provided iterable
      */
     public static <T> EventStream<T> fromIterable(Iterable<T> eventList) {
         return new EventStream<>(observer -> {
@@ -489,6 +523,8 @@ public class EventStream<E> {
      *         by the source event streams
      * @throws IllegalArgumentException
      *             if the provided array of streams is empty
+	 * @param <E>
+	 *            the type of the event stream created by merging the provided streams
      */
     @SafeVarargs
     public final static <E> EventStream<E> merge(EventStream<E>... eventStreams) {
@@ -510,6 +546,8 @@ public class EventStream<E> {
      *         by the source event streams
      * @throws IllegalArgumentException
      *             if the provided array of streams is empty
+	 * @param <E>
+	 *            the type of the event stream created by merging the provided streams
      */
     public final static <E> EventStream<E> merge(Iterable<EventStream<E>> eventStreams) {
         
@@ -530,13 +568,16 @@ public class EventStream<E> {
         return new EventStream<>(new MergeEventPublisher<>(streamList));
     }
     
-    /**
-     * Removes one level of nesting from a stream of streams.
-     * 
-     * @param streamOfStreams
-     *            a stream of streams to flatten
-     * @return a new event stream with one level of nesting removed.
-     */
+	/**
+	 * Removes one level of nesting from a stream of streams.
+	 * 
+	 * @param streamOfStreams
+	 *            a stream of streams to flatten
+	 * @return a new event stream with one level of nesting removed.
+	 * @param <E>
+	 *            the type of the event stream created by flattening the stream
+	 *            of streams
+	 */
     public final static <E> EventStream<E> flatten(EventStream<EventStream<E>> streamOfStreams) {
         return new EventStream<>(new FlattenPublisher<>(streamOfStreams));
     }

@@ -42,11 +42,13 @@ public class EventSubject<E> extends EventStream<E> implements EventSource<E>, D
         this.eventLoop = requireNonNull(eventLoop);
     }
 
-    /**
-     * Creates a new event subject.
-     * 
-     * @return An {@link EventSubject}
-     */
+	/**
+	 * Creates a new event subject.
+	 * 
+	 * @return An {@link EventSubject}
+	 * @param <E>
+	 *            the type of data this subject emits.
+	 */
     public static <E> EventSubject<E> create() {
         return new EventSubject<>(new EventSourcePublisher<>(), EventLoop.createEventLoop());
     }

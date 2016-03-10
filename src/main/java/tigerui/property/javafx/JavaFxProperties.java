@@ -21,41 +21,48 @@ import tigerui.property.Property;
 import tigerui.property.PropertyStream;
 
 public enum JavaFxProperties {
-    ;  // no instances
-    
-    /**
-     * Creates a Property from a JavaFx Property.
-     * 
-     * @param property
-     *            some JavaFx property to create a {@link Property} for.
-     * @return a new {@link Property} that is backed by a JavaFx Property.
-     * @throws IllegalStateException
-     *             if this method is called from a thread other that the JavaFx
-     *             Platform Thread
-     */
-    public static <M> Property<M> fromFxProperty(javafx.beans.property.Property<M> property) {
-        JAVAFX_EVENT_LOOP.checkInEventLoop();
-        return Property.create(dispatcher -> new JavaFxPropertySource<>(property, dispatcher));
-    }
-    
-    /**
-     * Creates a property stream from an observable value.
-     * 
-     * @param observableValue
-     *            some observable value to create a property stream for
-     * @return a new {@link PropertyStream} that is backed by the provided
-     *         observable value.
-     * @throws IllegalStateException
-     *             if the provided {@link ObservableValue} is actually an
-     *             instance of a {@link WritableValue}, or if this method is
-     *             called from a thread other that the JavaFx Platform Thread
-     */
-    public static <M> PropertyStream<M> fromObservableValue(ObservableValue<M> observableValue) {
-        JAVAFX_EVENT_LOOP.checkInEventLoop();
-        // TODO: need to figure out a way to prevent creating a PropertyStream from a WritableValue
-//        checkArgument(! WritableValue.class.isAssignableFrom(observableValue.getClass()), 
-//                     "Use [" + JavaFxPropertySource.class.getSimpleName() + "] instead, " + 
-//                     "to ensure to be protected against re-entrancy." );
-        return PropertyStream.create(new ObservableValuePropertyPublisher<>(observableValue));
-    }
+	; // no instances
+
+	/**
+	 * Creates a Property from a JavaFx Property.
+	 * 
+	 * @param property
+	 *            some JavaFx property to create a {@link Property} for.
+	 * @return a new {@link Property} that is backed by a JavaFx Property.
+	 * @throws IllegalStateException
+	 *             if this method is called from a thread other that the JavaFx
+	 *             Platform Thread
+	 * @param <M>
+	 *            the type of the property
+	 */
+	public static <M> Property<M> fromFxProperty(javafx.beans.property.Property<M> property) {
+		JAVAFX_EVENT_LOOP.checkInEventLoop();
+		return Property.create(dispatcher -> new JavaFxPropertySource<>(property, dispatcher));
+	}
+
+	/**
+	 * Creates a property stream from an observable value.
+	 * 
+	 * @param observableValue
+	 *            some observable value to create a property stream for
+	 * @return a new {@link PropertyStream} that is backed by the provided
+	 *         observable value.
+	 * @throws IllegalStateException
+	 *             if the provided {@link ObservableValue} is actually an
+	 *             instance of a {@link WritableValue}, or if this method is
+	 *             called from a thread other that the JavaFx Platform Thread
+	 * @param <M>
+	 *            the type of the property
+	 */
+	public static <M> PropertyStream<M> fromObservableValue(ObservableValue<M> observableValue) {
+		JAVAFX_EVENT_LOOP.checkInEventLoop();
+		// TODO: need to figure out a way to prevent creating a PropertyStream
+		// from a WritableValue
+		// checkArgument(!
+		// WritableValue.class.isAssignableFrom(observableValue.getClass()),
+		// "Use [" + JavaFxPropertySource.class.getSimpleName() + "] instead, "
+		// +
+		// "to ensure to be protected against re-entrancy." );
+		return PropertyStream.create(new ObservableValuePropertyPublisher<>(observableValue));
+	}
 }

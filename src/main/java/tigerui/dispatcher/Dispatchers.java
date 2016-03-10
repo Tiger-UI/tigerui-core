@@ -42,25 +42,29 @@ public class Dispatchers {
         return instance;
     }
     
-    /**
-     * Creates a function that accepts a runnable and returns a runnable that is
-     * wrapped with calls to re-establish the current dispatch state.
-     * <p>
-     * This is used to protect against reentrant calls from time shifted
-     * dispatches. For example calling debounce would schedule the current
-     * dispatch some time in the future at which point the isDispatching state
-     * would be lost. It would therefore be possible to create an endless loop
-     * if the callback was reentrant. Re-establishing the isDispatching state as
-     * is done here assures that reentrant calls are ignored even when they are
-     * time shifted.
-     * <p>
-     * TODO: move this into the {@link EventLoop} class as part of the method
-     * call to schedule with timeout.
-     * 
-     * @return a {@link Function} that when called will capture the current
-     *         state of the dispatchers and wrap the provided runnable with
-     *         calls to restore this state.
-     */
+	/**
+	 * Creates a function that accepts a runnable and returns a runnable that is
+	 * wrapped with calls to re-establish the current dispatch state.
+	 * <p>
+	 * This is used to protect against reentrant calls from time shifted
+	 * dispatches. For example calling debounce would schedule the current
+	 * dispatch some time in the future at which point the isDispatching state
+	 * would be lost. It would therefore be possible to create an endless loop
+	 * if the callback was reentrant. Re-establishing the isDispatching state as
+	 * is done here assures that reentrant calls are ignored even when they are
+	 * time shifted.
+	 * <p>
+	 * TODO: move this into the {@link EventLoop} class as part of the method
+	 * call to schedule with timeout.
+	 * 
+	 * @param runnableToWrap
+	 *            some runnable to wrap with calls to re-establish the current
+	 *            dispatch state.
+	 * 
+	 * @return a {@link Function} that when called will capture the current
+	 *         state of the dispatchers and wrap the provided runnable with
+	 *         calls to restore this state.
+	 */
     public Runnable wrapRunnableWithCurrentDispatchState(Runnable runnableToWrap) {
 
         Map<AbstractDispatcher<?, ?, ?>, Void> dispatchingDispatchers = new WeakHashMap<>();

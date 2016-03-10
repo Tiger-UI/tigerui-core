@@ -16,6 +16,7 @@ package tigerui.property.operator;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import tigerui.event.operator.OperatorFilter;
 import tigerui.property.PropertyObserver;
 import tigerui.property.PropertySubscriber;
 import tigerui.property.publisher.PropertyPublisher;

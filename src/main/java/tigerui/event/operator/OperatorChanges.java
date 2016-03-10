@@ -30,7 +30,7 @@ import tigerui.event.EventSubscriber;
  *
  * @param <E>
  *            the type of the events scanned
- * @param <R>
+ * @param <C>
  *            the type of the generated values.
  */
 public class OperatorChanges<E, C> implements Operator<E, C> {

@@ -42,7 +42,8 @@ import tigerui.subscription.Subscription;
  * fields and listeners. The canonical use case would be as a field in some
  * model.<br>
  * <br>
- * For a property to be well behaved it must guarantee the following contract:<br>
+ * For a property to be well behaved it must guarantee the following contract:
+ * <br>
  * 1) only emit a values if the new value differs than the previous<br>
  * 2) always offer a non-null value from the method {@link #get()}<br>
  * 3) always emit a value when subscribed to. If the property is already
@@ -54,8 +55,8 @@ import tigerui.subscription.Subscription;
  * 6) not leak any subscriptions after being destroyed<br>
  * <br>
  * ADDITIONAL NOTES:<br>
- * 1) Attempting to set the current value to null, will result
- * in a {@link NullPointerException}.<br>
+ * 1) Attempting to set the current value to null, will result in a
+ * {@link NullPointerException}.<br>
  * 2) If your property can be null at any point, make sure to create an optional
  * property, using {@link #createOptional()} or {@link #createOptional(Object)}
  * <br>
@@ -65,7 +66,7 @@ import tigerui.subscription.Subscription;
  * an {@link IllegalStateException}.<br>
  * 
  * 
- * @param <T>
+ * @param <M>
  *            the type of object that this property emits.
  */
 public final class Property<M> extends PropertyStream<M> implements PropertySource<M>, Disposable {
@@ -226,17 +227,16 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
     
     // Factory methods
     
-    /**
-     * Creates a property using the provided property source factory and thread
-     * context.
-     * 
-     * @param propertySourceFactory
-     *            some factory that can be used to create a property source.
-     * @param eventLoop
-     *            the event loop to use to verify thread contract when using
-     *            the created property
-     * @return a new {@link Property}
-     */
+	/**
+	 * Creates a property using the provided property source factory and thread
+	 * context.
+	 * 
+	 * @param propertySourceFactory
+	 *            some factory that can be used to create a property source.
+	 * @return a new {@link Property}
+	 * @param <M>
+	 *            the type of the property to create
+	 */
     public static final <M> Property<M> create(PropertySourceFactory<M> propertySourceFactory) {
         PropertyDispatcher<M> dispatcher = createPropertyDispatcher();
         return new Property<>(propertySourceFactory.apply(dispatcher), dispatcher);
@@ -248,6 +248,8 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
      * @param initialValue
      *            some initial value for this property
      * @return a new Property
+	 * @param <M>
+	 *            the type of the property to create
      */
     public static <M> Property<M> create(M initialValue) {
         return create(ModelPropertySource.createFactory(initialValue));
@@ -257,6 +259,8 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
      * Creates an optional property
      * 
      * @return a new property initialized with empty.
+	 * @param <M>
+	 *            the type of the property to create
      */
     public static <M> Property<Optional<M>> createOptional() {
         return create(Optional.empty());
@@ -268,6 +272,8 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
      * @param initialValue
      *            some value to initialize the optional property with.
      * @return a new property initialize with the provided initial value.
+	 * @param <M>
+	 *            the type of the property to create
      */
     public static <M> Property<Optional<M>> createOptional(M initialValue) {
         return create(Optional.of(initialValue));
@@ -284,6 +290,8 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
      * @param subject
      *            some subject to create a new property from.
      * @return a property that is backed by the provided subject.
+	 * @param <T>
+	 *            the type of the property to create
      */
     public static <T> Property<T> fromSubject(BehaviorSubject<T> subject) {
         Property<T> property = Property.create(subject.getValue());
