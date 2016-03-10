@@ -1,4 +1,4 @@
-# RxUI
+# TigerUI
 Tools for creating reactive based UI applications
 
 ### Motivation
