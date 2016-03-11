@@ -9,9 +9,6 @@ version = '0.7.4'
 
 repositories {
     jcenter()
-    maven {
-      url "${nexusUrl}/content/groups/public"
-  }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -39,16 +36,20 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.0.31-beta'
 }
 
+def nexusUrl = hasProperty('nexusUrl')?nexusUrl:''
+def nexusUsername = hasProperty('nexusUsername')?nexusUsername:''
+def nexusPassword = hasProperty('nexusPassword')?nexusPassword:''
+
 uploadArchives {
   repositories {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
       
-      repository(url: "${nexusUrl}/service/local/staging/deploy/maven2/") {
+      repository(url: "nexusUrl/service/local/staging/deploy/maven2/") {
         authentication(userName: nexusUsername, password: nexusPassword)
       }
     
-      snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots/") {
+      snapshotRepository(url: "nexusUrl/content/repositories/snapshots/") {
         authentication(userName: nexusUsername, password: nexusPassword)
       }
       
