@@ -1,6 +1,10 @@
 # TigerUI
 Tools for creating reactive based UI applications
 
+## Master Build Status
+
+<a href='https://travis-ci.org/Tiger-UI/tigerui-core/builds'><img src='https://travis-ci.org/Tiger-UI/tigerui-core.svg?branch=master'></a>
+
 ### Motivation
 #### Minimize Boilerplate
 Creating UIs generally means wiring together components using listeners. Although writing listeners and callbacks is exciting in it's own way (heavy sigh!), writing all the boilerplate to achieve this is error prone and highly repetative. Never mind the ***callback hell*** that goes along with the traditional approach. In an ideal world we as developers should be focused on the look and feel, and behavior of the application, not it's plumbing. Using a reactive (streaming/event) based approach allows us to escape callback hell. In a nutshell, the library strives to minimize the amount of code you need to write in order to connect components, by removing the noise and boilerplate without loosing clarity.
