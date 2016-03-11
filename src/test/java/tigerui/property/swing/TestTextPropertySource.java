@@ -39,7 +39,7 @@ public class TestTextPropertySource {
     }
     
     @Test
-    public void testTextPropertySource() throws Exception {
+    public void testTextPropertySource() throws Throwable {
         testHelper.runTest(() -> {            
             JTextField textField = new JTextField();
             Property<String> textProperty = TextPropertySource.createTextProperty(textField);
@@ -57,7 +57,7 @@ public class TestTextPropertySource {
     }
     
     @Test
-    public void testDisposeProperty() throws Exception {
+    public void testDisposeProperty() throws Throwable {
         testHelper.runTest(() -> {            
             JTextField textField = new JTextField();
             
@@ -74,7 +74,7 @@ public class TestTextPropertySource {
     }
     
     @Test
-    public void testSetPropertyValueUpdatesTextField() throws Exception {
+    public void testSetPropertyValueUpdatesTextField() throws Throwable {
         testHelper.runTest(() -> {            
             JTextField textField = new JTextField();
             Property<String> textProperty = TextPropertySource.createTextProperty(textField);
@@ -86,7 +86,7 @@ public class TestTextPropertySource {
     }
     
     @Test
-    public void testDocumentRemoveUpdate() throws Exception {
+    public void testDocumentRemoveUpdate() throws Throwable {
         testHelper.runTest(() -> {            
             JTextField textField = new JTextField("tacos");
             Document document = textField.getDocument();

@@ -61,11 +61,11 @@ public class JavaFxTestHelper
         }
     }
 
-    public void runTest(Runnable someTest) {
-        testHelper.runTest(someTest);
-    }
+//    public void runTest(Runnable someTest) {
+//        testHelper.runTest(someTest);
+//    }
 
-    public void runTestReThrowException(Runnable someTestThatShouldThrow) throws Throwable {
-        testHelper.runTestReThrowException(someTestThatShouldThrow);
+    public void runTest(Runnable someTestThatShouldThrow) throws Throwable {
+        testHelper.runTest(someTestThatShouldThrow);
     }
 }

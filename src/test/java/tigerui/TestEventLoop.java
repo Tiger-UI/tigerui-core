@@ -13,7 +13,6 @@
  */
 package tigerui;
 
-import static org.junit.Assert.*;
 import static tigerui.EventLoop.JAVAFX_EVENT_LOOP;
 import static tigerui.EventLoop.SWING_EVENT_LOOP;
 import static tigerui.ThreadedTestHelper.EDT_TEST_HELPER;
@@ -23,7 +22,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import tigerui.EventLoop;
 import tigerui.property.javafx.JavaFxTestHelper;
 
 public class TestEventLoop {
@@ -39,7 +37,7 @@ public class TestEventLoop {
     }
     
     @Test
-    public void testCreateEDTEventLoop() throws Exception {
+    public void testCreateEDTEventLoop() throws Throwable {
         AtomicReference<EventLoop> eventLoop = new AtomicReference<>();
         
         EDT_TEST_HELPER.runTest(() -> {
@@ -52,7 +50,7 @@ public class TestEventLoop {
     }
     
     @Test
-    public void testInvokeNowOnEDT() {
+    public void testInvokeNowOnEDT() throws Throwable {
         EDT_TEST_HELPER.runTest(() -> {
             Runnable runnable = Mockito.mock(Runnable.class);
             
@@ -64,7 +62,7 @@ public class TestEventLoop {
     
     @Test(expected=IllegalStateException.class)
     public void testInvokeNowOnEDTFromWrongThread() throws Throwable {
-        JavaFxTestHelper.instance().runTestReThrowException(() -> {
+        JavaFxTestHelper.instance().runTest(() -> {
             Runnable runnable = Mockito.mock(Runnable.class);
             
             SWING_EVENT_LOOP.invokeNow(runnable);
@@ -74,7 +72,7 @@ public class TestEventLoop {
     }
     
     @Test
-    public void testInvokeNowOnPlatformThread() {
+    public void testInvokeNowOnPlatformThread() throws Throwable {
         JavaFxTestHelper.instance().runTest(() -> {
             Runnable runnable = Mockito.mock(Runnable.class);
             
@@ -86,7 +84,7 @@ public class TestEventLoop {
     
     @Test(expected=IllegalStateException.class)
     public void testInvokeNowOnPlatformThreadFromWrongThread() throws Throwable {
-        EDT_TEST_HELPER.runTestReThrowException(() -> {
+        EDT_TEST_HELPER.runTest(() -> {
             Runnable runnable = Mockito.mock(Runnable.class);
             
             JAVAFX_EVENT_LOOP.invokeNow(runnable);
@@ -96,7 +94,7 @@ public class TestEventLoop {
     }
     
     @Test(expected=IllegalStateException.class)
-    public void testCreateEDTEventLoopThrows() throws Exception {
+    public void testCreateEDTEventLoopThrows() throws Throwable {
         AtomicReference<EventLoop> eventLoop = new AtomicReference<>();
         
         EDT_TEST_HELPER.runTest(() -> {
@@ -107,7 +105,7 @@ public class TestEventLoop {
     }
     
     @Test
-    public void testCreatePlatformEventLoop() throws Exception {
+    public void testCreatePlatformEventLoop() throws Throwable {
         AtomicReference<EventLoop> eventLoop = new AtomicReference<>();
         
         JavaFxTestHelper.instance().runTest(() -> {
@@ -120,7 +118,7 @@ public class TestEventLoop {
     }
     
     @Test(expected=IllegalStateException.class)
-    public void testCreatePlatformEventLoopThrows() throws Exception {
+    public void testCreatePlatformEventLoopThrows() throws Throwable {
         AtomicReference<EventLoop> eventLoop = new AtomicReference<>();
         
         JavaFxTestHelper.instance().runTest(() -> {
@@ -139,6 +137,6 @@ public class TestEventLoop {
     public void testArbitraryEventLoopThrows() throws Throwable {
         EventLoop eventLoop = ThreadedTestHelper.createOnEDT(EventLoop::createEventLoop);
         
-        JavaFxTestHelper.instance().runTestReThrowException(eventLoop::checkInEventLoop);
+        JavaFxTestHelper.instance().runTest(eventLoop::checkInEventLoop);
     }
 }

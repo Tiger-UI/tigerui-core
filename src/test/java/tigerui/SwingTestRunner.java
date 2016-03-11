@@ -20,6 +20,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
+import tigerui.ThreadedTestHelper.TestRunException;
+
 /**
  * A test runner that will execute tests on the EDT
  */
@@ -32,6 +34,25 @@ public class SwingTestRunner extends BlockJUnit4ClassRunner {
     @Override
     protected Statement methodInvoker(FrameworkMethod method, Object test) {
         Statement invoker = super.methodInvoker(method, test);
-        return EDT_TEST_HELPER.wrapStatementToRunOnEDT(invoker);
+        return wrapStatementToRunOnEDT(invoker);
+    }
+    
+    private Statement wrapStatementToRunOnEDT(Statement statement) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                EDT_TEST_HELPER.runTest(createRunnable(statement));
+            }
+        };
+    }
+    
+    private Runnable createRunnable(Statement statement) {
+        return () -> {
+            try {
+                statement.evaluate();
+            } catch (Throwable throwable) {
+                throw new TestRunException(throwable);
+            }
+        };
     }
 }

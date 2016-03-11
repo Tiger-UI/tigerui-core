@@ -1,10 +1,17 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
+group = 'io.tigerui'
+archivesBaseName = "tigerui-core"
+version = '0.7.4'
 
 repositories {
     jcenter()
+    maven {
+      url "${nexusUrl}/content/groups/public"
+  }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -21,6 +28,10 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
+signing {
+    sign configurations.archives
+}
+
 dependencies {
     compile 'io.reactivex:rxjava:1.0.16'
 
@@ -31,18 +42,41 @@ dependencies {
 uploadArchives {
   repositories {
     mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
       
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
+      repository(url: "${nexusUrl}/service/local/staging/deploy/maven2/") {
+        authentication(userName: nexusUsername, password: nexusPassword)
       }
     
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
+      snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots/") {
+        authentication(userName: nexusUsername, password: nexusPassword)
       }
       
-      pom.version = "0.7-SNAPSHOT"
-      pom.artifactId = "tigerui-core"
-      pom.groupId = "io.tigerui"
+      pom.project {
+        name 'tigerui-core'
+        packaging 'jar'
+        description 'A toolkit for reactive (event/stream) based UI development on the JVM'
+        url 'https://github.com/Tiger-UI/tigerui-core'
+
+        scm {
+          url 'https://github.com/Tiger-UI/tigerui-core'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'mbaum'
+            name 'Mike Baum'
+            email 'michael.baum@gmail.com'
+          }
+        }
+      }
     }
   }
 }

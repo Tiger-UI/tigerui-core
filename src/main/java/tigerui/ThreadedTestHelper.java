@@ -26,9 +26,6 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.Assert;
-import org.junit.runners.model.Statement;
-
 import rx.Observable;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
@@ -69,12 +66,12 @@ public class ThreadedTestHelper {
      *            some {@link Runnable} test that should be performed on
      *            this test helpers thread.
      */
-    public void runTest(Runnable someTest) {
-        AtomicReference<Throwable> error = runTestAndCaptureExceptionIfAny(someTest);
-        
-        if (error.get() != null)
-            Assert.fail(error.get().getMessage());
-    }
+//    public void runTest(Runnable someTest) {
+//        AtomicReference<Throwable> error = runTestAndCaptureExceptionIfAny(someTest);
+//        
+//        if (error.get() != null)
+//            Assert.fail(error.get().getMessage());
+//    }
 
     private AtomicReference<Throwable> runTestAndCaptureExceptionIfAny(Runnable someTest) {
         AtomicReference<Throwable> error = new AtomicReference<>();
@@ -101,7 +98,7 @@ public class ThreadedTestHelper {
      * @throws Throwable
      *             some throwable if the test fails exceptionally.
      */
-    public void runTestReThrowException(Runnable someTestThatShouldThrow) throws Throwable {
+    public void runTest(Runnable someTestThatShouldThrow) throws Throwable {
         AtomicReference<Throwable> error = runTestAndCaptureExceptionIfAny(someTestThatShouldThrow);
         
         if (error.get() != null) {
@@ -113,25 +110,6 @@ public class ThreadedTestHelper {
                 throw error.get();
             }
         }
-    }
-    
-    public Statement wrapStatementToRunOnEDT(Statement statement) {
-        return new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                runTestReThrowException(createRunnable(statement));
-            }
-        };
-    }
-    
-    private Runnable createRunnable(Statement statement) {
-        return () -> {
-            try {
-                statement.evaluate();
-            } catch (Throwable throwable) {
-                throw new TestRunException(throwable);
-            }
-        };
     }
     
     /**

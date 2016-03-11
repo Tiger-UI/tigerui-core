@@ -59,7 +59,7 @@ public class TestJavaFxProperties {
     }
     
     @Test
-    public void testSetValueOnJavaFxProperty() throws Exception {
+    public void testSetValueOnJavaFxProperty() throws Throwable {
         javaFxTestHelper.runTest(() -> {            
             PropertyObserver<String> observer = Mockito.mock(PropertyObserver.class);
             
@@ -75,7 +75,7 @@ public class TestJavaFxProperties {
     }
     
     @Test
-    public void testSetValueProperty() throws Exception {
+    public void testSetValueProperty() throws Throwable {
         javaFxTestHelper.runTest(() -> { 
             PropertyObserver<String> observer = Mockito.mock(PropertyObserver.class);
             
@@ -92,7 +92,7 @@ public class TestJavaFxProperties {
     }
     
     @Test
-    public void testUnsubscribeRemovesListener() throws Exception {
+    public void testUnsubscribeRemovesListener() throws Throwable {
         javaFxTestHelper.runTest(() -> {
             SimpleStringProperty observableValue = Mockito.spy(new SimpleStringProperty("tacos"));
             PropertyStream<String> stream = fromObservableValue(observableValue);
@@ -114,7 +114,7 @@ public class TestJavaFxProperties {
     
     @Test(expected=NullPointerException.class)
     public void testCannotCreatePropertyIfFxPropetyHasNoValue() throws Throwable {
-        javaFxTestHelper.runTestReThrowException(() -> fromFxProperty(new SimpleStringProperty()));
+        javaFxTestHelper.runTest(() -> fromFxProperty(new SimpleStringProperty()));
     }
     
     @Test(expected=IllegalStateException.class)
@@ -123,7 +123,7 @@ public class TestJavaFxProperties {
     }
     
     @Test
-    public void testPropertyStreamFromObservableValue() throws Exception {
+    public void testPropertyStreamFromObservableValue() throws Throwable {
         javaFxTestHelper.runTest(() -> {            
             Task<Integer> task = new Task<Integer>() {
                 @Override
