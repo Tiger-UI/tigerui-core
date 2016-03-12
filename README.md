@@ -2,6 +2,7 @@
 Tools for creating reactive based UI applications
 
 <a href='https://travis-ci.org/Tiger-UI/tigerui-core/builds'><img src='https://travis-ci.org/Tiger-UI/tigerui-core.svg?branch=master'></a>
+[![Coverage Status](https://coveralls.io/repos/github/Tiger-UI/tigerui-core/badge.svg?branch=master)](https://coveralls.io/github/Tiger-UI/tigerui-core?branch=master)
 
 ### Motivation
 #### Minimize Boilerplate
