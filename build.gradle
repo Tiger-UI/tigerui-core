@@ -5,7 +5,7 @@ apply plugin: 'signing'
 
 group = 'io.tigerui'
 archivesBaseName = "tigerui-core"
-version = '0.7.4'
+version = '0.7.5'
 
 repositories {
     jcenter()
@@ -37,20 +37,20 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.0.31-beta'
 }
 
-def nexusUrl = hasProperty('nexusUrl')?nexusUrl:''
-def nexusUsername = hasProperty('nexusUsername')?nexusUsername:''
-def nexusPassword = hasProperty('nexusPassword')?nexusPassword:''
+def nexusUrl = hasProperty('ossrUrl')?ossrUrl:''
+def nexusUsername = hasProperty('ossrUsername')?ossrUsername:''
+def nexusPassword = hasProperty('ossrPassword')?ossrPassword:''
 
 uploadArchives {
   repositories {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
       
-      repository(url: "nexusUrl/service/local/staging/deploy/maven2/") {
+      repository(url: "${nexusUrl}/service/local/staging/deploy/maven2/") {
         authentication(userName: nexusUsername, password: nexusPassword)
       }
     
-      snapshotRepository(url: "nexusUrl/content/repositories/snapshots/") {
+      snapshotRepository(url: "${nexusUrl}/content/repositories/snapshots/") {
         authentication(userName: nexusUsername, password: nexusPassword)
       }
       
@@ -62,6 +62,8 @@ uploadArchives {
 
         scm {
           url 'https://github.com/Tiger-UI/tigerui-core'
+          connection 'scm:https://mikebaum@github.com/Tiger-UI/tigerui-core.git'
+          developerConnection 'scm:git://github.com/Tiger-UI/tigerui-core.git'
         }
 
         licenses {
