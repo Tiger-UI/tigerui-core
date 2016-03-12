@@ -102,9 +102,7 @@ public class ThreadedTestHelper {
         AtomicReference<Throwable> error = runTestAndCaptureExceptionIfAny(someTestThatShouldThrow);
         
         if (error.get() != null) {
-            if (error.get() instanceof AssertionError) {
-                throw error.get().getCause();
-            } else if (error.get() instanceof TestRunException) {
+            if (error.get() instanceof TestRunException) {
                 throw error.get().getCause();
             } else {
                 throw error.get();
