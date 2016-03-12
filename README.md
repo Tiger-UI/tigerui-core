@@ -1,8 +1,6 @@
 # TigerUI
 Tools for creating reactive based UI applications
 
-## Master Build Status
-
 <a href='https://travis-ci.org/Tiger-UI/tigerui-core/builds'><img src='https://travis-ci.org/Tiger-UI/tigerui-core.svg?branch=master'></a>
 
 ### Motivation
