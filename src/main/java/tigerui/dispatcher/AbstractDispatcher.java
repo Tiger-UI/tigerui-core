@@ -130,6 +130,17 @@ public abstract class AbstractDispatcher<V, S extends Subscriber & Observer<V>, 
         return type;
     }
     
+	/**
+	 * If this Dispatcher is currently paused the runnable will be queued and
+	 * executed once resumed, otherwise it will be executed immediately.
+	 * 
+	 * <p>Before being executed the runnable will be wrapped in order to toggle on
+	 * then off the isDispatching flag.
+	 * 
+	 * @param disptchRunnable
+	 *            some dispatch runnable to execute either now or (if paused)
+	 *            later.
+	 */
     protected void dispatchOrQueue(Runnable disptchRunnable) {
         Runnable wrappedRunnable = wrapRunnableWithIsDispatching(disptchRunnable);
         if (isPaused()) {

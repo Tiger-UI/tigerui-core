@@ -73,7 +73,7 @@ public class ThreadedTestHelper {
 //            Assert.fail(error.get().getMessage());
 //    }
 
-    private AtomicReference<Throwable> runTestAndCaptureExceptionIfAny(Runnable someTest) {
+    private AtomicReference<Throwable> runTestAndCaptureExceptionIfAny(ThrowingRunnable someTest) {
         AtomicReference<Throwable> error = new AtomicReference<>();
         
         Runnable errorCapturingRunnable = () -> {
@@ -98,7 +98,7 @@ public class ThreadedTestHelper {
      * @throws Throwable
      *             some throwable if the test fails exceptionally.
      */
-    public void runTest(Runnable someTestThatShouldThrow) throws Throwable {
+    public void runTest(ThrowingRunnable someTestThatShouldThrow) throws Throwable {
         AtomicReference<Throwable> error = runTestAndCaptureExceptionIfAny(someTestThatShouldThrow);
         
         if (error.get() != null) {

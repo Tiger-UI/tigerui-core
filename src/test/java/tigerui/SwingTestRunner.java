@@ -46,7 +46,7 @@ public class SwingTestRunner extends BlockJUnit4ClassRunner {
         };
     }
     
-    private Runnable createRunnable(Statement statement) {
+    private ThrowingRunnable createRunnable(Statement statement) {
         return () -> {
             try {
                 statement.evaluate();

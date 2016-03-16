@@ -14,8 +14,8 @@
 package tigerui.property;
 
 import static java.util.Objects.requireNonNull;
-import static tigerui.Preconditions.checkState;
 import static tigerui.dispatcher.Dispatcher.createPropertyDispatcher;
+import static tigerui.dispatcher.Dispatchers.checkCanDispatch;
 
 import java.util.Optional;
 
@@ -91,7 +91,7 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
     }
 
     /**
-     * @throws IllegalStateException see {@link #checkCanSetValue()}
+     * @throws IllegalStateException see {@link Dispatchers#checkCanDispatch()}
      */
     @Override
     public void setValue(M value) {
@@ -110,28 +110,9 @@ public final class Property<M> extends PropertyStream<M> implements PropertySour
             return;
         
         // blows up with an illegal state exception if an attempt is made to set the value via a non-binding callback.
-        checkCanSetValue();
+        checkCanDispatch();
         
         propertySource.setValue(requireNonNull(value));
-    }
-
-    /**
-     * Checks whether the setValue call can be dispatched safely. It is only
-     * safe to set the value of this property within a Binding. Failing to
-     * respect this invariant would subvert the glitch protection that has been
-     * put in place.
-     * 
-     * @throws IllegalStateException
-     *             if an attempt was made to set the value from a callback,
-     *             other than a binding.
-     */
-    private void checkCanSetValue() {
-        boolean isNotDispatching = ! Dispatchers.getInstance().isDispatching();
-        boolean isDispatchingToBinding = Dispatchers.getInstance().isDispatchingBinding();
-        
-        checkState(isNotDispatching || isDispatchingToBinding, 
-                   "It is not possible to add a callback that sets the value of a property. " + 
-                   "You must use bind to connect a stream to this property");
     }
 
     /**

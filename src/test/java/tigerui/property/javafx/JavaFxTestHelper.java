@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import tigerui.ThreadedTestHelper;
+import tigerui.ThrowingRunnable;
 
 /**
  * A helper that should be used to run unit tests that must run on the JavaFx
@@ -61,11 +62,7 @@ public class JavaFxTestHelper
         }
     }
 
-//    public void runTest(Runnable someTest) {
-//        testHelper.runTest(someTest);
-//    }
-
-    public void runTest(Runnable someTestThatShouldThrow) throws Throwable {
+    public void runTest(ThrowingRunnable someTestThatShouldThrow) throws Throwable {
         testHelper.runTest(someTestThatShouldThrow);
     }
 }

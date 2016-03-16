@@ -13,6 +13,8 @@
  */
 package tigerui.dispatcher;
 
+import static tigerui.Preconditions.checkState;
+
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -91,10 +93,22 @@ public class Dispatchers {
         };
     }
     
+	/**
+	 * Checks if any dispatchers are currently dispatching.
+	 * 
+	 * @return true if any dispatcher is currently dispatching, false otherwise.
+	 */
     public boolean isDispatching() {
         return dispatchers.keySet().stream().filter(Dispatcher::isDispatching).findAny().isPresent();
     }
-    
+
+	/**
+	 * Checks all dispatchers to see if any of them are currently dispatching a
+	 * binding.
+	 * 
+	 * @return true if any of the currently dispatching dispatchers are
+	 *         dispatching a binding.
+	 */
     public boolean isDispatchingBinding() {
         return dispatchers.keySet().stream().filter(AbstractDispatcher::isDispatchingToBinding).findAny().isPresent();
     }
@@ -140,7 +154,43 @@ public class Dispatchers {
         return eventDispatcher;
     }
     
-    public static interface PropertyDispatcherFactory
+	/**
+	 * Checks whether it is possible to dispatch a value. It is only possible to
+	 * dispatch a value if either:
+	 * <ol>
+	 * <li>There is no dispatch in progress, or
+	 * <li>If there is a dispatch in progress the current dispatch due to a
+	 * binding.
+	 * </ol>
+	 * 
+	 * <p>
+	 * Failing to respect these invariants would subvert the glitch protection
+	 * that has been put in place.
+	 * 
+	 * @throws IllegalStateException
+	 *             if an attempt was made to set the value from a callback,
+	 *             other than a binding.
+	 */
+	public static void checkCanDispatch() {
+		/**
+		 * if no dispatcher is currently dispatching then it's okay to set the
+		 * value of the property.
+		 */
+	    boolean isNotDispatching = ! getInstance().isDispatching();
+		/**
+		 * If currently dispatching it is okay to set the value if the property
+		 * via a binding. TODO: this might not be the right check. It might be
+		 * more appropriate to only allow the set if the current observer is a
+		 * binding.
+		 */
+	    boolean isDispatchingToBinding = getInstance().isDispatchingBinding();
+	    
+	    checkState(isNotDispatching || isDispatchingToBinding, 
+	               "It is not possible to add a callback that sets the value of a property. " + 
+	               "You must use bind to connect a stream to this property");
+	}
+
+	public static interface PropertyDispatcherFactory
     {
         <M> PropertyDispatcher<M> create();
     }
