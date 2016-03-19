@@ -123,8 +123,8 @@ public class ThreadedTestHelper {
      * @param pollInterval
      *            the time interval to poll at
      */
-    public static <T> void waitForConditionOnEDT(Supplier<String> getter, 
-                                                 Predicate<String> predicate,
+    public static <T> void waitForConditionOnEDT(Supplier<T> getter, 
+                                                 Predicate<T> predicate,
                                                  Duration timeout,
                                                  Duration pollInterval) {
         Observable.interval(pollInterval.toMillis(), MILLISECONDS, Schedulers.from(SwingUtilities::invokeLater))
