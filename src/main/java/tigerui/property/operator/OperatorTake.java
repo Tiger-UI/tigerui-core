@@ -13,6 +13,8 @@
  */
 package tigerui.property.operator;
 
+import static tigerui.Preconditions.checkArgument;
+
 import tigerui.property.PropertyObserver;
 import tigerui.property.PropertyStream;
 import tigerui.property.PropertySubscriber;
@@ -34,6 +36,7 @@ public class OperatorTake<M> implements PropertyOperator<M, M> {
     private final int takeTotal;
     
     public OperatorTake(int takeTotal) {
+    	checkArgument(takeTotal > 0, "Must take at least one event.");
         this.takeTotal = takeTotal;
     }
     

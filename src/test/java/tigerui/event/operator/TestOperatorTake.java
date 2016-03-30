@@ -15,8 +15,8 @@ package tigerui.event.operator;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.function.Consumer;
 
@@ -31,16 +31,16 @@ import tigerui.event.EventSubject;
 import tigerui.subscription.Subscription;
 
 @RunWith(SwingTestRunner.class)
-public class TestOperatorFilter {
+public class TestOperatorTake {
     @Test
-    public void testFilter() {
+    public void testTake() {
         EventSubject<String> events = EventSubject.create();
-        EventStream<String> filteredStream = events.filter(val -> val.length() > 4);
+        EventStream<String> takeStream = events.take(2);
         
         Consumer<String> onEvent = Mockito.mock(Consumer.class);
         Runnable onCompleted = Mockito.mock(Runnable.class);
         
-        Subscription subscription = filteredStream.observe(EventObserver.create(onEvent, onCompleted));
+        Subscription subscription = takeStream.observe(EventObserver.create(onEvent, onCompleted));
         assertFalse(subscription.isDisposed());
         
         events.publish("tacos");
@@ -48,26 +48,21 @@ public class TestOperatorFilter {
         
         events.publish("burritos");
         Mockito.verify(onEvent).accept("burritos");
+        verify(onCompleted).run();
         
-        // Just double checking that an event stream does not suppress consecutive duplicates values.
-        events.publish("burritos");
-        Mockito.verify(onEvent, times(2)).accept("burritos");
-        Mockito.verifyNoMoreInteractions(onCompleted);
-        
-        // this should be filtered
-        events.publish("the");
-        Mockito.verifyNoMoreInteractions(onCompleted);
+        events.publish("fajitas");
+        verifyNoMoreInteractions(onEvent, onCompleted);
     }
     
     @Test
     public void testDisposeUnsubscribesObserver() {
         EventSubject<String> events = EventSubject.create();
-        EventStream<String> filteredStream = events.filter(val -> val.contains("tac"));
+        EventStream<String> takeStream = events.take(1);
         
         Consumer<String> onEvent = Mockito.mock(Consumer.class);
         Runnable onCompleted = Mockito.mock(Runnable.class);
         
-        Subscription subscription = filteredStream.observe(EventObserver.create(onEvent, onCompleted));
+        Subscription subscription = takeStream.observe(EventObserver.create(onEvent, onCompleted));
         assertFalse(subscription.isDisposed());
         
         events.dispose();
@@ -82,9 +77,9 @@ public class TestOperatorFilter {
         
         assertFalse(events.hasObservers());
 
-        EventStream<String> filteredStream = events.filter(val -> val.contains("tacos"));
+        EventStream<String> takeStream = events.take(1);
         EventObserver<String> observer = Mockito.mock(EventObserver.class);
-        Subscription subscription = filteredStream.observe(observer);
+        Subscription subscription = takeStream.observe(observer);
 
         assertTrue(events.hasObservers());
         
@@ -95,12 +90,12 @@ public class TestOperatorFilter {
     @Test
     public void testSubscribeAfterDisposed() {
         EventSubject<String> events = EventSubject.create();
-        EventStream<String> filteredStream = events.filter(val -> val.contains("tacos"));
+        EventStream<String> takeStream = events.take(1);
         EventObserver<String> observer = Mockito.mock(EventObserver.class);
         
         events.dispose();
         
-        Subscription subscription = filteredStream.observe(observer);
+        Subscription subscription = takeStream.observe(observer);
 
         verify(observer, Mockito.never()).onEvent(Mockito.anyString());
         verify(observer).onCompleted();
