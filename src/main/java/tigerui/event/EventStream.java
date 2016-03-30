@@ -41,6 +41,7 @@ import tigerui.event.operator.OperatorMap;
 import tigerui.event.operator.OperatorScan;
 import tigerui.event.operator.OperatorScanOptional;
 import tigerui.event.operator.OperatorSwitchMap;
+import tigerui.event.operator.OperatorTake;
 import tigerui.event.publisher.EventPublisher;
 import tigerui.event.publisher.FlattenPublisher;
 import tigerui.event.publisher.LiftEventPublisher;
@@ -297,6 +298,21 @@ public class EventStream<E> {
 	 */
     public final <C> EventStream<C> changes(BiFunction<E, E, C> changeEventFactory) {
         return lift(new OperatorChanges<>(changeEventFactory));
+    }
+    
+    /**
+     * Creates a new {@link EventStream} that when subscribed to will
+     * only every emit as many items as specified by the provided numberToTake
+     * parameter.<br>
+     * 
+     * @param numberToTake
+     *            the number of events to emit
+     * @return a new {@link EventStream} that only emits as many items as
+     *         specified in the amount parameter
+     * @throws IllegalArgumentException if zero elements is requested
+     */
+    public final EventStream<E> take(int numberToTake) {
+    	return lift(new OperatorTake<>(numberToTake));
     }
     
     /**
